@@ -1,0 +1,60 @@
+<app-navbar></app-navbar>
+
+<div class="dashboard-container">
+  <div class="welcome-section">
+    <h1>¡Bienvenido!</h1>
+    <p>¿En qué materia o curso necesitas ayuda?</p>
+  </div>
+
+  <div class="search-section">
+    <div class="chat-container">
+      <div class="chat-input-area">
+        <textarea 
+          [(ngModel)]="searchQuery"
+          placeholder="Ejemplo: Necesito ayuda con Cálculo Diferencial, estoy mal en derivadas..."
+          (keydown.enter)="searchCourses($event)"
+          rows="3">
+        </textarea>
+        <button class="btn-search" (click)="searchCourses()">
+          🔍 Buscar Recursos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-section" *ngIf="courses.length > 0">
+    <h2>📚 Recursos Recomendados para Ti</h2>
+    
+    <div class="courses-grid">
+      <div class="course-card" *ngFor="let course of courses">
+        <div class="course-type">{{ course.type }}</div>
+        <img [src]="course.thumbnail" [alt]="course.title">
+        <div class="course-content">
+          <h3>{{ course.title }}</h3>
+          <p class="course-platform">{{ course.platform }}</p>
+          <p class="course-description">{{ course.description }}</p>
+          
+          <div class="course-meta">
+            <span class="duration">⏱️ {{ course.duration }}</span>
+            <span class="level" [ngClass]="course.level">{{ course.level }}</span>
+          </div>
+          
+          <div class="course-stats">
+            <span>⭐ {{ course.rating }}</span>
+            <span>👥 {{ course.students }}</span>
+          </div>
+          
+          <a [href]="course.url" target="_blank" class="btn-view-course">
+            Ver Recurso →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="courses.length === 0 && hasSearched">
+    <div class="empty-icon">🔍</div>
+    <p>No se encontraron resultados para tu búsqueda.</p>
+    <p class="empty-subtitle">Intenta con otras palabras clave o temas diferentes.</p>
+  </div>
+</div>
