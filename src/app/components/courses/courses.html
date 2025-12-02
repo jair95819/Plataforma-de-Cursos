@@ -1,0 +1,92 @@
+<app-navbar></app-navbar>
+
+<div class="courses-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h1>📚 Galería de Cursos</h1>
+    <p>Explora nuestra colección de cursos y encuentra el perfecto para ti</p>
+  </div>
+
+  <!-- Search & Filters Section -->
+  <div class="filters-section">
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery"
+        placeholder="🔍 Buscar cursos por tema, área o palabra clave..."
+        (keydown.enter)="searchCourses()">
+      <button class="btn-search" (click)="searchCourses()">Buscar</button>
+    </div>
+    
+    <div class="filters-row">
+      <div class="filter-group">
+        <label>Nivel:</label>
+        <select [(ngModel)]="selectedLevel" (change)="applyFilters()">
+          <option value="">Todos los niveles</option>
+          <option *ngFor="let level of levels" [value]="level">{{ level }}</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label>Plataforma:</label>
+        <select [(ngModel)]="selectedPlatform" (change)="applyFilters()">
+          <option value="">Todas las plataformas</option>
+          <option *ngFor="let platform of platforms" [value]="platform">{{ platform }}</option>
+        </select>
+      </div>
+      
+      <button class="btn-clear" (click)="clearFilters()">
+        ✕ Limpiar filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loader"></div>
+    <p>Cargando cursos...</p>
+  </div>
+
+  <!-- Courses Gallery -->
+  <div class="gallery-section" *ngIf="!isLoading && filteredCourses.length > 0">
+    <div class="results-info">
+      <span>{{ filteredCourses.length }} curso(s) encontrado(s)</span>
+    </div>
+    
+    <div class="courses-gallery">
+      <div class="gallery-card" *ngFor="let course of filteredCourses" (click)="viewCourseDetail(course.id)">
+        <div class="card-image">
+          <img [src]="course.thumbnail" [alt]="course.title">
+          <div class="card-overlay">
+            <span class="overlay-text">Ver Detalles</span>
+          </div>
+          <span class="card-type">{{ course.type }}</span>
+          <span class="card-level" [ngClass]="course.level">{{ course.level }}</span>
+        </div>
+        
+        <div class="card-content">
+          <h3>{{ course.title }}</h3>
+          <p class="card-platform">{{ course.platform }}</p>
+          <p class="card-description">{{ course.description }}</p>
+          
+          <div class="card-footer">
+            <div class="card-stats">
+              <span class="stat">⭐ {{ course.rating }}</span>
+              <span class="stat">👥 {{ course.students }}</span>
+              <span class="stat">⏱️ {{ course.duration }}</span>
+            </div>
+            <button class="btn-view">Ver Curso →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && filteredCourses.length === 0">
+    <div class="empty-icon">📭</div>
+    <h2>No se encontraron cursos</h2>
+    <p>Intenta con otros términos de búsqueda o ajusta los filtros</p>
+    <button class="btn-retry" (click)="clearFilters()">Mostrar todos los cursos</button>
+  </div>
+</div>

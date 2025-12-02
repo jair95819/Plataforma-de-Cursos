@@ -27,6 +27,14 @@ export class CourseService {
   constructor(private http: HttpClient) { }
 
   /**
+   * Obtiene todos los cursos.
+   * Endpoint: GET /api/cursos
+   */
+  getAllCursos(): Observable<Curso[]> {
+    return this.http.get<Curso[]>(this.apiUrl);
+  }
+
+  /**
    * Obtiene la lista de cursos destacados (top 3 por rating).
    * Endpoint: GET /api/cursos/destacados
    */
@@ -47,5 +55,12 @@ export class CourseService {
     return this.http.get<Curso[]>(`${this.apiUrl}/recomendar?area=${encodedArea}`);
   }
 
-  // Puedes añadir aquí otros métodos como getCursoById(id) o crearCurso(curso)
+  /**
+   * Obtiene los detalles de un curso específico por su ID.
+   * Endpoint: GET /api/cursos/{id}
+   * @param id El ID del curso a obtener.
+   */
+  getCursoById(id: number): Observable<Curso> {
+    return this.http.get<Curso>(`${this.apiUrl}/${id}`);
+  }
 }

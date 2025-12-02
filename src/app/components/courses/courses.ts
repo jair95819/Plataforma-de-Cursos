@@ -1,102 +1,134 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Necesario para *ngIf y *ngFor
-import { FormsModule } from '@angular/forms';     // Necesario para [(ngModel)]
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CourseService, Curso } from '../../services/curso-service'; // Asegúrate que la ruta sea correcta
+import { CourseService, Curso } from '../../services/curso-service';
 import { NavbarComponent } from '../shared/navbar/navbar';
-// import { NavbarComponent } from '../navbar/navbar.component'; // Descomenta si ya tienes tu Navbar creada
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-courses',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent], // Agrega NavbarComponent aquí si lo tienes
-  templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.css']
+  imports: [CommonModule, FormsModule, NavbarComponent],
+  templateUrl: './courses.html',
+  styleUrls: ['./courses.css']
 })
-export class DashboardComponent implements OnInit {
+export class CoursesComponent implements OnInit {
   
-  // Variables ligadas al HTML
+  courses: any[] = [];
+  filteredCourses: any[] = [];
+  isLoading: boolean = true;
   searchQuery: string = '';
-  courses: any[] = []; // Usamos 'any' aquí porque mapearemos los datos de Java al formato visual de tu HTML
-  hasSearched: boolean = false;
-  isLoading: boolean = false; // Estado de carga
+  selectedLevel: string = '';
+  selectedPlatform: string = '';
+  
+  // Niveles que coinciden con los del backend
+  levels: string[] = ['Básico', 'Intermedio', 'Avanzado'];
+  platforms: string[] = [
+    'Coursera', 'edX', 'Udemy', 'Platzi', 'LinkedIn Learning',
+    'FreeCodeCamp', 'Khan Academy', 'Google Developers', 
+    'Harvard OpenCourseWare', 'MIT OpenCourseWare'
+  ];
   
   // Imagen por defecto en base64 (carga instantánea)
   private defaultThumbnail: string = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMjAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMzIwIDIwMCI+PHJlY3Qgd2lkdGg9IjMyMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiMxYTFhMmUiLz48Y2lyY2xlIGN4PSIxNjAiIGN5PSI4MCIgcj0iNDAiIGZpbGw9IiM2NjdlZWEiIG9wYWNpdHk9IjAuMyIvPjxwYXRoIGQ9Ik0xNDAgNzBsMzAgMjAtMzAgMjB6IiBmaWxsPSIjNjY3ZWVhIi8+PHRleHQgeD0iMTYwIiB5PSIxNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2N2VlYSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Q3Vyc28gT25saW5lPC90ZXh0Pjwvc3ZnPg==';
 
   constructor(
-    private courseService: CourseService, 
+    private courseService: CourseService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    // El dashboard es para buscar cursos, no cargamos nada al inicio
+    this.loadAllCourses();
   }
 
-  searchCourses(event?: any): void {
-    // Si se presiona Enter, evitamos el comportamiento por defecto
-    if (event) {
-      event.preventDefault();
-    }
-
-    if (!this.searchQuery || this.searchQuery.trim() === '') {
-      return;
-    }
-
+  loadAllCourses(): void {
     this.isLoading = true;
-    this.hasSearched = true;
     
-    // Llamada al servicio (Backend Spring Boot)
-    this.courseService.getRecomendaciones(this.searchQuery).subscribe({
+    // Cargamos todos los cursos
+    this.courseService.getAllCursos().subscribe({
       next: (data: Curso[]) => {
-        // CORRECCIÓN IMPORTANTE:
-        // Validamos si 'data' existe. Si el backend devuelve null (204 No Content), 
-        // asignamos un array vacío [] para evitar errores con .map
         if (data) {
           this.courses = data.map(curso => this.mapearCursoParaVista(curso));
-        } else {
-          this.courses = [];
+          this.filteredCourses = [...this.courses];
         }
         this.isLoading = false;
-        this.cdr.detectChanges(); // Forzar actualización de la vista
-        console.log('Cursos encontrados:', this.courses);
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error buscando cursos:', err);
-        this.courses = [];
+        console.error('Error cargando cursos:', err);
         this.isLoading = false;
-        this.cdr.detectChanges(); // Forzar actualización de la vista
+        this.cdr.detectChanges();
       }
     });
   }
 
-  // Función auxiliar para traducir Backend -> Frontend
-  private mapearCursoParaVista(curso: Curso): any {
-    return {
-      id: curso.id, // Añadimos el ID para la navegación a detalles
-      title: curso.titulo,
-      description: curso.descripcion,
-      url: curso.url,
-      type: curso.tipo,      // Ej: "Matemáticas"
-      duration: curso.duracion,
-      level: curso.nivel,
-      rating: curso.rating,
-      students: curso.estudiantes,
-      // Mapeo especial para Plataforma (ID -> Nombre)
-      platform: this.obtenerNombrePlataforma(curso.plataformaId),
-      // Imagen SVG inline - carga instantánea
-      thumbnail: this.defaultThumbnail
-    };
+  searchCourses(): void {
+    if (!this.searchQuery || this.searchQuery.trim() === '') {
+      this.loadAllCourses();
+      return;
+    }
+
+    this.isLoading = true;
+    
+    this.courseService.getRecomendaciones(this.searchQuery).subscribe({
+      next: (data: Curso[]) => {
+        if (data) {
+          this.courses = data.map(curso => this.mapearCursoParaVista(curso));
+          this.applyFilters();
+        } else {
+          this.courses = [];
+          this.filteredCourses = [];
+        }
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error buscando cursos:', err);
+        this.courses = [];
+        this.filteredCourses = [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
-  // Método para navegar a los detalles del curso
+  applyFilters(): void {
+    this.filteredCourses = this.courses.filter(course => {
+      const matchesLevel = !this.selectedLevel || course.level === this.selectedLevel;
+      const matchesPlatform = !this.selectedPlatform || course.platform === this.selectedPlatform;
+      return matchesLevel && matchesPlatform;
+    });
+  }
+
+  clearFilters(): void {
+    this.searchQuery = '';
+    this.selectedLevel = '';
+    this.selectedPlatform = '';
+    this.loadAllCourses();
+  }
+
   viewCourseDetail(courseId: number): void {
     this.router.navigate(['/curso', courseId]);
   }
 
+  private mapearCursoParaVista(curso: Curso): any {
+    return {
+      id: curso.id,
+      title: curso.titulo,
+      description: curso.descripcion,
+      url: curso.url,
+      type: curso.tipo,
+      duration: curso.duracion,
+      level: curso.nivel,
+      rating: curso.rating,
+      students: curso.estudiantes,
+      platform: this.obtenerNombrePlataforma(curso.plataformaId),
+      thumbnail: this.defaultThumbnail
+    };
+  }
+
   private obtenerNombrePlataforma(id: number): string {
-    // Actualizado con tus IDs reales de la BD
     switch(id) {
       case 1: return 'Coursera';
       case 2: return 'edX';

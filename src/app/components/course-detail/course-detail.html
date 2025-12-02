@@ -1,0 +1,149 @@
+<app-navbar></app-navbar>
+
+<div class="detail-container">
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loader"></div>
+    <p>Cargando curso...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="error && !isLoading">
+    <div class="error-icon">❌</div>
+    <h2>{{ error }}</h2>
+    <button class="btn-back" (click)="goBack()">← Volver al Dashboard</button>
+  </div>
+
+  <!-- Course Detail -->
+  <div class="course-detail" *ngIf="course && !isLoading && !error">
+    <!-- Back Button -->
+    <button class="btn-back-floating" (click)="goBack()">
+      ← Volver
+    </button>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+      <div class="hero-overlay"></div>
+      <img [src]="course.thumbnail" [alt]="course.title" class="hero-image">
+      <div class="hero-content">
+        <span class="course-badge">{{ course.type }}</span>
+        <h1>{{ course.title }}</h1>
+        <div class="hero-meta">
+          <span class="platform-tag">
+            <span class="platform-emoji">{{ getPlatformLogo(course.platformId) }}</span>
+            {{ course.platform }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+      <div class="main-content">
+        <!-- Description Card -->
+        <div class="info-card">
+          <h2>📖 Descripción del Curso</h2>
+          <p class="description-text">{{ course.description }}</p>
+        </div>
+
+        <!-- What You'll Learn -->
+        <div class="info-card">
+          <h2>🎯 Lo que Aprenderás</h2>
+          <ul class="learning-list">
+            <li>Fundamentos y conceptos clave de {{ course.type }}</li>
+            <li>Aplicaciones prácticas y ejercicios</li>
+            <li>Proyectos para reforzar el aprendizaje</li>
+            <li>Certificado al completar el curso</li>
+          </ul>
+        </div>
+
+        <!-- Course Requirements -->
+        <div class="info-card">
+          <h2>📋 Requisitos</h2>
+          <ul class="requirements-list">
+            <li *ngIf="course.level === 'Básico'">No se requieren conocimientos previos</li>
+            <li *ngIf="course.level === 'Intermedio'">Conocimientos básicos del tema</li>
+            <li *ngIf="course.level === 'Avanzado'">Experiencia previa requerida</li>
+            <li>Conexión a internet</li>
+            <li>Ganas de aprender 🚀</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Stats Card -->
+        <div class="stats-card">
+          <div class="stat-item">
+            <span class="stat-icon">⏱️</span>
+            <div class="stat-info">
+              <span class="stat-label">Duración</span>
+              <span class="stat-value">{{ course.duration }}</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">📊</span>
+            <div class="stat-info">
+              <span class="stat-label">Nivel</span>
+              <span class="stat-value level-badge" [ngClass]="course.level">{{ course.level }}</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">⭐</span>
+            <div class="stat-info">
+              <span class="stat-label">Rating</span>
+              <div class="rating-container">
+                <span class="stat-value">{{ course.rating }}</span>
+                <div class="stars">
+                  <span *ngFor="let star of getRatingStars(course.rating)" 
+                        [class.filled]="star === 1">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">👥</span>
+            <div class="stat-info">
+              <span class="stat-label">Estudiantes</span>
+              <span class="stat-value">{{ course.students | number }}</span>
+            </div>
+          </div>
+          
+          <a [href]="course.url" target="_blank" class="btn-enroll">
+            🚀 Ir al Curso
+          </a>
+        </div>
+
+        <!-- Share Card -->
+        <div class="share-card">
+          <h3>Compartir Curso</h3>
+          <div class="share-buttons">
+            <button class="share-btn" title="Copiar enlace">📋</button>
+            <button class="share-btn" title="Compartir en Twitter">🐦</button>
+            <button class="share-btn" title="Compartir en LinkedIn">💼</button>
+            <button class="share-btn" title="Compartir por Email">📧</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Courses -->
+    <div class="related-section" *ngIf="relatedCourses.length > 0">
+      <h2>📚 Cursos Relacionados</h2>
+      <div class="related-grid">
+        <div class="related-card" *ngFor="let related of relatedCourses" (click)="viewCourse(related.id)">
+          <img [src]="related.thumbnail" [alt]="related.title">
+          <div class="related-content">
+            <span class="related-type">{{ related.type }}</span>
+            <h3>{{ related.title }}</h3>
+            <p class="related-platform">{{ related.platform }}</p>
+            <div class="related-meta">
+              <span>⭐ {{ related.rating }}</span>
+              <span>⏱️ {{ related.duration }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

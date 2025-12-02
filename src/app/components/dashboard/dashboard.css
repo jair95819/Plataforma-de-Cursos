@@ -31,6 +31,37 @@
   pointer-events: none;
 }
 
+/* ===== LOADING STATE ===== */
+.loading-state {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1.5rem;
+}
+
+.loader {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
 /* ===== WELCOME SECTION ===== */
 .welcome-section {
   position: relative;
@@ -330,7 +361,7 @@
   text-transform: uppercase;
 }
 
-.level.Principiante {
+.level.Básico {
   background: linear-gradient(135deg, rgba(67, 233, 123, 0.2) 0%, rgba(56, 249, 215, 0.2) 100%);
   color: #43e97b;
   border: 1px solid rgba(67, 233, 123, 0.3);
@@ -368,24 +399,53 @@
   gap: 0.4rem;
 }
 
+/* ===== COURSE ACTIONS ===== */
+.course-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: auto;
+}
+
+.btn-details {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-details:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
 .btn-view-course {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
-  width: 100%;
-  padding: 1.2rem;
+  padding: 1rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #ffffff;
   text-align: center;
   text-decoration: none;
-  border-radius: 15px;
+  border-radius: 12px;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   transition: all 0.3s ease;
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
   letter-spacing: 0.5px;
-  margin-top: auto;
 }
 
 .btn-view-course:hover {

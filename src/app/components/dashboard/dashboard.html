@@ -22,7 +22,13 @@
     </div>
   </div>
 
-  <div class="results-section" *ngIf="courses.length > 0">
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loader"></div>
+    <p>Buscando cursos...</p>
+  </div>
+
+  <div class="results-section" *ngIf="!isLoading && courses.length > 0">
     <h2>📚 Recursos Recomendados para Ti</h2>
     
     <div class="courses-grid">
@@ -44,15 +50,20 @@
             <span>👥 {{ course.students }}</span>
           </div>
           
-          <a [href]="course.url" target="_blank" class="btn-view-course">
-            Ver Recurso →
-          </a>
+          <div class="course-actions">
+            <button class="btn-details" (click)="viewCourseDetail(course.id)">
+              📋 Ver Detalles
+            </button>
+            <a [href]="course.url" target="_blank" class="btn-view-course">
+              Ver Recurso →
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="empty-state" *ngIf="courses.length === 0 && hasSearched">
+  <div class="empty-state" *ngIf="!isLoading && courses.length === 0 && hasSearched">
     <div class="empty-icon">🔍</div>
     <p>No se encontraron resultados para tu búsqueda.</p>
     <p class="empty-subtitle">Intenta con otras palabras clave o temas diferentes.</p>
